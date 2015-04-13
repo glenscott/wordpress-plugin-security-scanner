@@ -2,7 +2,7 @@
 Contributors: glen_scott
 Tags: plugins,security,scanner,vulnerabilities,secure
 Tested up to: 4.1.1
-Stable tag: 1.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 
 This plugin determines whether any of your plugins have security vulnerabilities.  It does this by looking up details in the WPScan Vulnerability Database.
