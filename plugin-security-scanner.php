@@ -81,3 +81,62 @@ function my_plugin_options() {
     echo '<p>Scan completed:  <strong>' . $vulnerability_count . '</strong> vulnerabilit' . ($vulnerability_count == 1 ? 'y' : 'ies') .  ' found.</p>';
     echo '</div>';
 }
+
+// scheduled email to admin
+register_activation_hook( __FILE__, 'prefix_activation' );
+/**
+ * On activation, set a time, frequency and name of an action hook to be scheduled.
+ */
+function prefix_activation() {
+    wp_schedule_event( time(), 'daily', 'prefix_daily_event_hook' );
+}
+
+add_action( 'prefix_daily_event_hook', 'prefix_do_this_daily' );
+/**
+ * On the scheduled action hook, run the function.
+ */
+function prefix_do_this_daily() {
+    $admin_email = get_option( 'admin_email' );
+
+    if ($admin_email) {
+        $mail_body = '';
+
+        // run scan
+        $vulnerability_count = 0;
+
+        foreach (get_plugins() as $name => $details) {
+            // get unique name 
+            if (preg_match('|(.+)/|', $name, $matches)) {
+                $result = $request->request( 'https://wpvulndb.com/api/v1/plugins/' . $matches[1] );
+
+                if ($result['body']) {
+                    $plugin = json_decode($result['body']);
+
+                    if (isset($plugin->plugin->vulnerabilities)) {
+                        foreach ($plugin->plugin->vulnerabilities as $vuln) {
+                            if (version_compare($details['Version'], $vuln->fixed_in, '<')) {
+                                $mail_body .= "Vulnerability found: " . $vuln->title . "\n";
+                                $vulnerability_count++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // if vulns, email admin
+        if ($vulnerability_count) {
+            $mail_body .= "\n\n" . 'Scan completed:  ' . $vulnerability_count . ' vulnerabilit' . ($vulnerability_count == 1 ? 'y' : 'ies') .  ' found.' . "\n";
+
+            wp_mail($admin_email, "Plugin Security Scan " . date_i18n( get_option( 'date_format' ) ), $mail_body);
+        }
+    }
+}
+
+register_deactivation_hook( __FILE__, 'prefix_deactivation' );
+/**
+ * On deactivation, remove all functions from the scheduled action hook.
+ */
+function prefix_deactivation() {
+    wp_clear_scheduled_hook( 'prefix_daily_event_hook' );
+}
