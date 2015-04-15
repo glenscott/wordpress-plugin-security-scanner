@@ -129,7 +129,7 @@ function prefix_do_this_daily() {
         if ($vulnerability_count) {
             $mail_body .= "\n\n" . 'Scan completed:  ' . $vulnerability_count . ' vulnerabilit' . ($vulnerability_count == 1 ? 'y' : 'ies') .  ' found.' . "\n";
 
-            wp_mail($admin_email, "Plugin Security Scan " . date_i18n( get_option( 'date_format' ) ), $mail_body);
+            wp_mail($admin_email, get_bloginfo() . " Plugin Security Scan " . date_i18n( get_option( 'date_format' ) ), $mail_body);
         }
     }
 }
