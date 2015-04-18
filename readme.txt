@@ -23,6 +23,9 @@ Icons made by <a href="http://www.flaticon.com/authors/alessio-atzeni" title="Al
 
 == Changelog ==
 
+= 1.1.5 =
+* Escape output in HTML report to prevent XSS
+
 = 1.1.4 =
 * Added blog title to email subject
 
