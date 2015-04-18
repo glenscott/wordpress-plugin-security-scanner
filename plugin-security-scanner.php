@@ -33,15 +33,15 @@ if ( ! class_exists( 'WP_Http' ) ) {
 }
 
 /** Step 2 (from text above). */
-add_action( 'admin_menu', 'my_plugin_menu' );
+add_action( 'admin_menu', 'plugin_security_scanner_menu' );
 
 /** Step 1. */
-function my_plugin_menu() {
-	add_management_page( 'Plugin Security Scanner', 'Plugin Security Scanner', 'manage_options', 'plugin-security-scanner', 'my_plugin_options' );
+function plugin_security_scanner_menu() {
+	add_management_page( 'Plugin Security Scanner', 'Plugin Security Scanner', 'manage_options', 'plugin-security-scanner', 'plugin_security_scanner_options' );
 }
 
 /** Step 3. */
-function my_plugin_options() {
+function plugin_security_scanner_options() {
 	if ( ! current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
@@ -80,19 +80,19 @@ function my_plugin_options() {
 }
 
 // scheduled email to admin
-register_activation_hook( __FILE__, 'prefix_activation' );
+register_activation_hook( __FILE__, 'plugin_security_scanner_activation' );
 /**
  * On activation, set a time, frequency and name of an action hook to be scheduled.
  */
-function prefix_activation() {
-	wp_schedule_event( time(), 'daily', 'prefix_daily_event_hook' );
+function plugin_security_scanner_activation() {
+	wp_schedule_event( time(), 'daily', 'plugin_security_scanner_daily_event_hook' );
 }
 
-add_action( 'prefix_daily_event_hook', 'prefix_do_this_daily' );
+add_action( 'plugin_security_scanner_daily_event_hook', 'plugin_security_scanner_do_this_daily' );
 /**
  * On the scheduled action hook, run the function.
  */
-function prefix_do_this_daily() {
+function plugin_security_scanner_do_this_daily() {
 	$admin_email = get_option( 'admin_email' );
 
 	if ( $admin_email ) {
@@ -136,5 +136,5 @@ register_deactivation_hook( __FILE__, 'prefix_deactivation' );
  * On deactivation, remove all functions from the scheduled action hook.
  */
 function prefix_deactivation() {
-	wp_clear_scheduled_hook( 'prefix_daily_event_hook' );
+	wp_clear_scheduled_hook( 'plugin_security_scanner_daily_event_hook' );
 }
