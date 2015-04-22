@@ -4,7 +4,7 @@
  * Plugin Name: Plugin Security Scanner
  * Plugin URI: http://www.glenscott.co.uk/plugin-security-scanner/
  * Description: This plugin determines whether any of your plugins have security vulnerabilities.  It does this by looking up details in the WPScan Vulnerability Database.
- * Version: 1.1.5
+ * Version: 1.1.6
  * Author: Glen Scott
  * Author URI: http://www.glenscott.co.uk
  * License: GPL2
@@ -30,6 +30,12 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 if ( ! class_exists( 'WP_Http' ) ) {
 	include_once( ABSPATH . WPINC. '/class-http.php' );
+}
+
+// Check if get_plugins() function exists. This is required on the front end of the
+// site, since it is in a file that is normally only loaded in the admin.
+if ( ! function_exists( 'get_plugins' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
 
 /** Step 2 (from text above). */
