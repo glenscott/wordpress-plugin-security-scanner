@@ -20,6 +20,7 @@ Icons made by <a href="http://www.flaticon.com/authors/alessio-atzeni" title="Al
 == Screenshots ==
 
 1. Example run of the security scanner that has found two vulnerable plugins.
+2. E-mail alert to administrator when vulnerable plugins have been found.
 
 == Changelog ==
 
