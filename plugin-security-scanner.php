@@ -4,10 +4,11 @@
  * Plugin Name: Plugin Security Scanner
  * Plugin URI: http://www.glenscott.co.uk/plugin-security-scanner/
  * Description: This plugin determines whether any of your plugins have security vulnerabilities.  It does this by looking up details in the WPScan Vulnerability Database.
- * Version: 1.1.9
+ * Version: 1.2.0
  * Author: Glen Scott
  * Author URI: http://www.glenscott.co.uk
  * License: GPL2
+ * Text Domain: plugin-security-scanner
  */
 
 /*  Copyright 2015  Glen Scott  (email : glen@glenscott.co.uk)
@@ -38,21 +39,19 @@ if ( ! function_exists( 'get_plugins' ) ) {
 	require_once ABSPATH . 'wp-admin/includes/plugin.php';
 }
 
-/** Step 2 (from text above). */
 add_action( 'admin_menu', 'plugin_security_scanner_menu' );
 
-/** Step 1. */
 function plugin_security_scanner_menu() {
-	add_management_page( 'Plugin Security Scanner', 'Plugin Security Scanner', 'manage_options', 'plugin-security-scanner', 'plugin_security_scanner_options' );
+	add_management_page( __( 'Plugin Security Scanner', 'plugin-security-scanner' ),
+	__( 'Plugin Security Scanner', 'plugin-security-scanner' ), 'manage_options', 'plugin-security-scanner', 'plugin_security_scanner_options' );
 }
 
-/** Step 3. */
 function plugin_security_scanner_options() {
 	if ( ! current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
 	echo '<div class="wrap">';
-	echo '<h2>Plugin Security Scanner</h2>';
+	echo '<h2>' . esc_html__( 'Plugin Security Scanner', 'plugin-security-scanner' ) . '</h2>';
 
 	$request = new WP_Http;
 
@@ -70,7 +69,7 @@ function plugin_security_scanner_options() {
 					foreach ( $plugin->plugin->vulnerabilities as $vuln ) {
 						if ( ! isset($vuln->fixed_in) ||
 							version_compare( $details['Version'], $vuln->fixed_in, '<' ) ) {
-							echo '<p><strong>Vulnerability found:</strong> ' . esc_html( $vuln->title ) . ' -- <a href="' . esc_url( 'https://wpvulndb.com/vulnerabilities/' . $vuln->id ) . '" target="_blank">View details</a></p>';
+							echo '<p><strong>' . esc_html__( 'Vulnerability found', 'plugin-security-scanner' ) . ':</strong> ' . esc_html( $vuln->title ) . ' -- <a href="' . esc_url( 'https://wpvulndb.com/vulnerabilities/' . $vuln->id ) . '" target="_blank">' . esc_html__( 'View details', 'plugin-security-scanner' ) . '</a></p>';
 
 							$vulnerability_count++;
 						}
@@ -81,7 +80,7 @@ function plugin_security_scanner_options() {
 		}
 	}
 
-	echo '<p>Scan completed:  <strong>' . esc_html( $vulnerability_count ) . '</strong> vulnerabilit' . esc_html( ( $vulnerability_count == 1 ? 'y' : 'ies') ) .  ' found.</p>';
+	echo '<p>' . esc_html__( 'Scan completed', 'plugin-security-scanner' ) . ':  <strong>' . esc_html( $vulnerability_count ) . '</strong> ' . esc_html( _n( 'vulnerability', 'vulnerabilities', $vulnerability_count, 'plugin-security-scanner' ) ) . ' found.</p>';
 	echo '</div>';
 }
 
@@ -120,7 +119,7 @@ function plugin_security_scanner_do_this_daily() {
 						foreach ( $plugin->plugin->vulnerabilities as $vuln ) {
 							if ( ! isset($vuln->fixed_in) ||
 								version_compare( $details['Version'], $vuln->fixed_in, '<' ) ) {
-								$mail_body .= 'Vulnerability found: ' . $vuln->title . "\n";
+								$mail_body .= __( 'Vulnerability found', 'plugin-security-scanner' ) . ': ' . $vuln->title . "\n";
 								$vulnerability_count++;
 							}
 						}
@@ -131,17 +130,15 @@ function plugin_security_scanner_do_this_daily() {
 
 		// if vulns, email admin
 		if ( $vulnerability_count ) {
-			$mail_body .= "\n\n" . 'Scan completed:  ' . $vulnerability_count . ' vulnerabilit' . ($vulnerability_count == 1 ? 'y' : 'ies') .  ' found.' . "\n";
+			$mail_body .= "\n\n" . __( 'Scan completed', 'plugin-security-scanner' ) . ':  ' . $vulnerability_count . _n( 'vulnerability', 'vulnerabilities', $vulnerability_count, 'plugin-security-scanner' ) .  ' found.' . "\n";
 
-			wp_mail( $admin_email, get_bloginfo() . ' Plugin Security Scan ' . date_i18n( get_option( 'date_format' ) ), $mail_body );
+			wp_mail( $admin_email, get_bloginfo() . ' ' . __( 'Plugin Security Scan', 'plugin-security-scanner' ) . ' ' . date_i18n( get_option( 'date_format' ) ), $mail_body );
 		}
 	}
 }
 
 register_deactivation_hook( __FILE__, 'prefix_deactivation' );
-/**
- * On deactivation, remove all functions from the scheduled action hook.
- */
+
 function prefix_deactivation() {
 	wp_clear_scheduled_hook( 'plugin_security_scanner_daily_event_hook' );
 }
