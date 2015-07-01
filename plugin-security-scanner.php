@@ -80,7 +80,12 @@ function plugin_security_scanner_options() {
 		}
 	}
 
-	echo '<p>' . esc_html__( 'Scan completed', 'plugin-security-scanner' ) . ':  <strong>' . esc_html( $vulnerability_count ) . '</strong> ' . esc_html( _n( 'vulnerability', 'vulnerabilities', $vulnerability_count, 'plugin-security-scanner' ) ) . ' found.</p>';
+	echo '<p>' . sprintf( _n(
+		'Scan completed: %s vulnerability found.',
+	    'Scan completed: %s vulnerabilities found.',
+		$vulnerability_count, 'plugin-security-scanner'), '<strong>' . $vulnerability_count . '</strong>' ) .
+		'</p>';
+
 	echo '</div>';
 }
 
@@ -130,7 +135,10 @@ function plugin_security_scanner_do_this_daily() {
 
 		// if vulns, email admin
 		if ( $vulnerability_count ) {
-			$mail_body .= "\n\n" . __( 'Scan completed', 'plugin-security-scanner' ) . ':  ' . $vulnerability_count . _n( 'vulnerability', 'vulnerabilities', $vulnerability_count, 'plugin-security-scanner' ) .  ' found.' . "\n";
+			$mail_body .= "\n\n" . sprintf(_n(
+				'Scan completed: %s vulnerability found.',
+				'Scan completed: %s vulnerabilities found.',
+			$vulnerability_count, 'plugin-security-scanner'), $vulnerability_count) . "\n";
 
 			wp_mail( $admin_email, get_bloginfo() . ' ' . __( 'Plugin Security Scan', 'plugin-security-scanner' ) . ' ' . date_i18n( get_option( 'date_format' ) ), $mail_body );
 		}
