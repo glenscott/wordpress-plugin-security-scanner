@@ -130,7 +130,6 @@ function plugin_security_scanner_do_this_daily() {
 		$mail_body = '';
 
 		// run scan
-		$request = new WP_Http;
 		$vulnerability_count = 0;
 
 		$vulnerabilities = get_vulnerable_plugins();
