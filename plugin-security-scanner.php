@@ -46,16 +46,10 @@ function plugin_security_scanner_menu() {
 	__( 'Plugin Security Scanner', 'plugin-security-scanner' ), 'manage_options', 'plugin-security-scanner', 'plugin_security_scanner_options' );
 }
 
-function plugin_security_scanner_options() {
-	if ( ! current_user_can( 'manage_options' ) )  {
-		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
-	}
-	echo '<div class="wrap">';
-	echo '<h2>' . esc_html__( 'Plugin Security Scanner', 'plugin-security-scanner' ) . '</h2>';
+function get_vulnerable_plugins() {
+	$vulnerabilities = array();
 
 	$request = new WP_Http;
-
-	$vulnerability_count = 0;
 
 	foreach ( get_plugins() as $name => $details ) {
 		// get unique name
@@ -69,21 +63,48 @@ function plugin_security_scanner_options() {
 					foreach ( $plugin->plugin->vulnerabilities as $vuln ) {
 						if ( ! isset($vuln->fixed_in) ||
 							version_compare( $details['Version'], $vuln->fixed_in, '<' ) ) {
-							echo '<p><strong>' . esc_html__( 'Vulnerability found', 'plugin-security-scanner' ) . ':</strong> ' . esc_html( $vuln->title ) . ' -- <a href="' . esc_url( 'https://wpvulndb.com/vulnerabilities/' . $vuln->id ) . '" target="_blank">' . esc_html__( 'View details', 'plugin-security-scanner' ) . '</a></p>';
-
-							$vulnerability_count++;
+							$vulnerabilities[$name][] = $vuln;
 						}
 					}
 				}
 			}
-			flush();
 		}
 	}
 
-	echo '<p>' . sprintf( _n(
-		'Scan completed: %s vulnerability found.',
-	    'Scan completed: %s vulnerabilities found.',
-		$vulnerability_count, 'plugin-security-scanner'), '<strong>' . $vulnerability_count . '</strong>' ) .
+	return $vulnerabilities;
+}
+
+function plugin_security_scanner_options() {
+	if ( ! current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+	}
+	echo '<div class="wrap">';
+	echo '<h2>' . esc_html__( 'Plugin Security Scanner', 'plugin-security-scanner' ) . '</h2>';
+
+	$vulnerability_count = 0;
+
+	$vulnerabilities = get_vulnerable_plugins();
+
+	foreach ( $vulnerabilities as $plugin_name => $plugin_vulnerabilities ) {
+		foreach ( $plugin_vulnerabilities as $vuln ) {
+				echo '<p><strong>' . esc_html__( 'Vulnerability found', 'plugin-security-scanner' ) . ':</strong> ' . esc_html( $vuln->title ) . ' -- <a href="' . esc_url( 'https://wpvulndb.com/vulnerabilities/' . $vuln->id ) . '" target="_blank">' . esc_html__( 'View details', 'plugin-security-scanner' ) . '</a></p>';
+
+					$vulnerability_count++;
+		}
+		flush();
+	}
+
+	echo '<p>' .
+		sprintf(
+			_n(
+				'Scan completed: %s vulnerability found.',
+			    'Scan completed: %s vulnerabilities found.',
+				$vulnerability_count,
+				'plugin-security-scanner'
+			),
+			'<strong>' . esc_html( $vulnerability_count ) . '</strong>'
+		)
+	.
 		'</p>';
 
 	echo '</div>';
@@ -112,24 +133,12 @@ function plugin_security_scanner_do_this_daily() {
 		$request = new WP_Http;
 		$vulnerability_count = 0;
 
-		foreach ( get_plugins() as $name => $details ) {
-			// get unique name
-			if ( preg_match( '|(.+)/|', $name, $matches ) ) {
-				$result = $request->request( 'https://wpvulndb.com/api/v1/plugins/' . $matches[1] );
+		$vulnerabilities = get_vulnerable_plugins();
 
-				if ( $result['body'] ) {
-					$plugin = json_decode( $result['body'] );
-
-					if ( isset( $plugin->plugin->vulnerabilities ) ) {
-						foreach ( $plugin->plugin->vulnerabilities as $vuln ) {
-							if ( ! isset($vuln->fixed_in) ||
-								version_compare( $details['Version'], $vuln->fixed_in, '<' ) ) {
-								$mail_body .= __( 'Vulnerability found', 'plugin-security-scanner' ) . ': ' . $vuln->title . "\n";
-								$vulnerability_count++;
-							}
-						}
-					}
-				}
+		foreach ( $vulnerabilities as $plugin_name => $plugin_vulnerabilities ) {
+			foreach ( $plugin_vulnerabilities as $vuln ) {
+				$mail_body .= __( 'Vulnerability found', 'plugin-security-scanner' ) . ': ' . $vuln->title . "\n";
+				$vulnerability_count++;
 			}
 		}
 
