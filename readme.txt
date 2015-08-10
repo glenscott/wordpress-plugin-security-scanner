@@ -1,7 +1,7 @@
 === Plugin Security Scanner ===
 Contributors: glen_scott
 Tags: plugins,security,scanner,vulnerabilities,secure
-Tested up to: 4.2
+Tested up to: 4.3
 Stable tag: 1.2.0
 License: GPLv2 or later
 
