@@ -54,13 +54,14 @@ function get_vulnerable_plugins() {
 	foreach ( get_plugins() as $name => $details ) {
 		// get unique name
 		if ( preg_match( '|(.+)/|', $name, $matches ) ) {
-			$result = $request->request( 'https://wpvulndb.com/api/v2/plugins/' . $matches[1] );
+			$plugin_key = $matches[1];
+			$result = $request->request( 'https://wpvulndb.com/api/v2/plugins/' . $plugin_key );
 
 			if ( $result['body'] ) {
 				$plugin = json_decode( $result['body'] );
 
-				if ( isset( $plugin->plugin->vulnerabilities ) ) {
-					foreach ( $plugin->plugin->vulnerabilities as $vuln ) {
+				if ( isset( $plugin->$plugin_key->vulnerabilities ) ) {
+					foreach ( $plugin->$plugin_key->vulnerabilities as $vuln ) {
 						if ( ! isset($vuln->fixed_in) ||
 							version_compare( $details['Version'], $vuln->fixed_in, '<' ) ) {
 							$vulnerabilities[$name][] = $vuln;
