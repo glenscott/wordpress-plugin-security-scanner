@@ -4,7 +4,7 @@
  * Plugin Name: Plugin Security Scanner
  * Plugin URI: http://www.glenscott.co.uk/plugin-security-scanner/
  * Description: This plugin determines whether any of your plugins have security vulnerabilities.  It does this by looking up details in the WPScan Vulnerability Database.
- * Version: 1.2.0
+ * Version: 1.2.1
  * Author: Glen Scott
  * Author URI: http://www.glenscott.co.uk
  * License: GPL2
@@ -54,7 +54,7 @@ function get_vulnerable_plugins() {
 	foreach ( get_plugins() as $name => $details ) {
 		// get unique name
 		if ( preg_match( '|(.+)/|', $name, $matches ) ) {
-			$result = $request->request( 'https://wpvulndb.com/api/v1/plugins/' . $matches[1] );
+			$result = $request->request( 'https://wpvulndb.com/api/v2/plugins/' . $matches[1] );
 
 			if ( $result['body'] ) {
 				$plugin = json_decode( $result['body'] );
