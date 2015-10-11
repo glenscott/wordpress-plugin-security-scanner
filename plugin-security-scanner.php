@@ -40,10 +40,40 @@ if ( ! function_exists( 'get_plugins' ) ) {
 }
 
 add_action( 'admin_menu', 'plugin_security_scanner_menu' );
+add_action( 'admin_init', 'plugin_security_scanner_register_settings' );
 
 function plugin_security_scanner_menu() {
 	add_management_page( __( 'Plugin Security Scanner', 'plugin-security-scanner' ),
-	__( 'Plugin Security Scanner', 'plugin-security-scanner' ), 'manage_options', 'plugin-security-scanner', 'plugin_security_scanner_options' );
+	__( 'Plugin Security Scanner', 'plugin-security-scanner' ), 'manage_options', 'plugin-security-scanner', 'plugin_security_scanner_tools' );
+}
+
+function plugin_security_scanner_register_settings() {
+	add_settings_section( 'plugin-security-scanner-section', __( 'Plugin Security Scanner', 'plugin-security-scanner' ),
+	'plugin_security_scanner_section_text', 'general' );
+	add_settings_field( 'plugin-security-scanner-email-notification', __( 'Email Notification', 'plugin-security-scanner' ),
+	'plugin_security_scanner_email_notification_field', 'general', 'plugin-security-scanner-section' );
+
+	error_log(print_r(get_option( 'plugin-security-scanner' ),true));
+	if ( false === get_option( 'plugin-security-scanner' ) ) {
+	    update_option( 'plugin-security-scanner', array( 'email_notification' => '1' ) );
+	}
+
+	register_setting( 'general', 'plugin-security-scanner', 'plugin_security_scanner_validate' );
+}
+
+function plugin_security_scanner_section_text() {
+}
+
+function plugin_security_scanner_validate($input) {
+	error_log("validate " . print_r($input,true));
+	return $input;
+}
+
+function plugin_security_scanner_email_notification_field() {
+	$options = get_option( 'plugin-security-scanner' );
+	error_log(print_r($options,true));
+	echo '<input type="checkbox" id="plugin-security-scanner-email-notification" name="plugin-security-scanner[email_notification]" value="1"' . checked( 1, $options['email_notification'], false ) . '/>';
+	echo '<label for="plugin-security-scanner-email-notification">Send an e-mail notification when vulnerable plugins are found?</label>';
 }
 
 function get_vulnerable_plugins() {
@@ -75,7 +105,7 @@ function get_vulnerable_plugins() {
 	return $vulnerabilities;
 }
 
-function plugin_security_scanner_options() {
+function plugin_security_scanner_tools() {
 	if ( ! current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
