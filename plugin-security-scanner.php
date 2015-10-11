@@ -53,7 +53,6 @@ function plugin_security_scanner_register_settings() {
 	add_settings_field( 'plugin-security-scanner-email-notification', __( 'Email Notification', 'plugin-security-scanner' ),
 	'plugin_security_scanner_email_notification_field', 'general', 'plugin-security-scanner-section' );
 
-	error_log(print_r(get_option( 'plugin-security-scanner' ),true));
 	if ( false === get_option( 'plugin-security-scanner' ) ) {
 	    update_option( 'plugin-security-scanner', array( 'email_notification' => '1' ) );
 	}
@@ -65,13 +64,17 @@ function plugin_security_scanner_section_text() {
 }
 
 function plugin_security_scanner_validate($input) {
-	error_log("validate " . print_r($input,true));
+	if ( ! is_array( $input ) ) {
+		$input = array(
+			'email_notification' => 0,
+			);
+	}
 	return $input;
 }
 
 function plugin_security_scanner_email_notification_field() {
 	$options = get_option( 'plugin-security-scanner' );
-	error_log(print_r($options,true));
+
 	echo '<input type="checkbox" id="plugin-security-scanner-email-notification" name="plugin-security-scanner[email_notification]" value="1"' . checked( 1, $options['email_notification'], false ) . '/>';
 	echo '<label for="plugin-security-scanner-email-notification">Send an e-mail notification when vulnerable plugins are found?</label>';
 }
@@ -155,9 +158,10 @@ add_action( 'plugin_security_scanner_daily_event_hook', 'plugin_security_scanner
  * On the scheduled action hook, run the function.
  */
 function plugin_security_scanner_do_this_daily() {
+	$options = get_option( 'plugin-security-scanner' );
 	$admin_email = get_option( 'admin_email' );
 
-	if ( $admin_email ) {
+	if ( $admin_email && '1' === $options['email_notification'] ) {
 		$mail_body = '';
 
 		// run scan
