@@ -9,11 +9,11 @@ This plugin alerts you if any of your plugins have security vulnerabilities.  It
 
 == Description ==
 
-This plugin determines whether any of your plugins have security vulnerabilities.  It does this by looking up details in the WPScan Vulnerability Database.
+This plugin determines whether any of your plugins or themes have security vulnerabilities.  It does this by looking up details in the WPScan Vulnerability Database.
 
-It will run a scan once a day, and e-mail the administrator if any vulnerable plugins are found.
+It will run a scan once a day, and e-mail the administrator if any vulnerable plugins or themes are found.
 
-It also adds a new menu option to the admin tools menu called "Plugin Security Scanner".  Clicking this runs a scan.  If the scan finds any problems, it shows you a list of plugins that have vulnerabilities, along with a description of the issue.
+It also adds a new menu option to the admin tools menu called "Plugin Security Scanner".  Clicking this runs a scan.  If the scan finds any problems, it shows you a list of plugins or themes that have vulnerabilities, along with a description of the issue.
 
 Icons made by <a href="http://www.flaticon.com/authors/alessio-atzeni" title="Alessio Atzeni">Alessio Atzeni</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>
 
