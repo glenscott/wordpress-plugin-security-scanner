@@ -52,9 +52,25 @@ function plugin_security_scanner_register_settings() {
 	'plugin_security_scanner_section_text', 'general' );
 	add_settings_field( 'plugin-security-scanner-email-notification', __( 'Email Notification', 'plugin-security-scanner' ),
 	'plugin_security_scanner_email_notification_field', 'general', 'plugin-security-scanner-section' );
+	add_settings_field( 'plugin-security-scanner-webhook-notification', __( 'Webhook Notification', 'plugin-security-scanner' ),
+	'plugin_security_scanner_webhook_notification_field', 'general', 'plugin-security-scanner-section' );
 
 	if ( false === get_option( 'plugin-security-scanner' ) ) {
-	    update_option( 'plugin-security-scanner', array( 'email_notification' => '1' ) );
+	    update_option( 'plugin-security-scanner', array(
+			 'email_notification' => '1',
+			 'webhook_notification' => '0',
+			 'webhook_notification_url' => '') );
+	} else {
+		$options = get_option( 'plugin-security-scanner' ) ;
+		if (false == array_key_exists('webhook_notification', $options)){
+			$options['webhook_notification'] = '0';
+			update_option( 'plugin-security-scanner', $options );
+		}
+
+		if (false == array_key_exists('webhook_notification_url', $options)){
+			$options['webhook_notification_url'] = '';
+			update_option( 'plugin-security-scanner', $options );
+		}
 	}
 
 	register_setting( 'general', 'plugin-security-scanner', 'plugin_security_scanner_validate' );
@@ -67,8 +83,21 @@ function plugin_security_scanner_validate($input) {
 	if ( ! is_array( $input ) ) {
 		$input = array(
 			'email_notification' => 0,
+			'webhook_notification' => 0,
+			'webhook_notification_url' => ''
 			);
 	}
+
+	$webhook = $input['webhook_notification'];
+	$url = $input['webhook_notification_url'];
+	if ($webhook == '1'){
+		if ($url == ''){
+			add_settings_error( 'plugin-security-scanner', esc_attr( 'setting_updated' ), 'missing required field webhook url', 'error' );
+		} else if (false == filter_var($url, FILTER_VALIDATE_URL)){
+			add_settings_error( 'plugin-security-scanner', esc_attr( 'setting_updated' ), 'webhook url is not a valid url', 'error' );
+		}
+	}
+
 	return $input;
 }
 
@@ -77,6 +106,15 @@ function plugin_security_scanner_email_notification_field() {
 
 	echo '<input type="checkbox" id="plugin-security-scanner-email-notification" name="plugin-security-scanner[email_notification]" value="1"' . checked( 1, $options['email_notification'], false ) . '/>';
 	echo '<label for="plugin-security-scanner-email-notification">Send an e-mail notification when vulnerable plugins are found?</label>';
+}
+
+function plugin_security_scanner_webhook_notification_field() {
+	$options = get_option( 'plugin-security-scanner' );
+
+	echo '<input type="checkbox" id="plugin-security-scanner-webhook-notification" name="plugin-security-scanner[webhook_notification]" value="1"' . checked( 1, $options['webhook_notification'], false ) . '/>';
+	echo '<label for="plugin-security-scanner-webhook-notification">Send a webhook notification when vulnerable plugins are found?</label>';
+	echo '<br />';
+	echo '<input type="url" id="plugin-security-scanner-webhook-notification-url" name="plugin-security-scanner[webhook_notification_url]" placeholder="webhook url" value="'. $options['webhook_notification_url'] . '"/>';
 }
 
 function get_vulnerable_plugins() {
