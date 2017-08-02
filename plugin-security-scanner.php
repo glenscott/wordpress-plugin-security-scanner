@@ -140,6 +140,8 @@ function get_vulnerable_plugins() {
 				foreach ( $version->$version_raw->vulnerabilities as $vuln ) {
 					$vulnerabilities[$version_raw][] = $vuln;
 				}
+			} else {
+				trigger_error( $result['body'], E_USER_ERROR );
 			}
 		}
 	}
@@ -170,7 +172,7 @@ function get_vulnerable_plugins() {
 					}
 				}
 			}
-		}
+		} 
 	}
 
 	foreach ( wp_get_themes() as $details ) {
