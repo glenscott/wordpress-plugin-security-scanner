@@ -259,13 +259,13 @@ function plugin_security_scanner_do_this_daily() {
 	$options = get_option( 'plugin-security-scanner' );
 	$admin_email = get_option( 'admin_email' );
 
+	$vulnerabilities = get_vulnerable_plugins();
+
 	if ( $admin_email && '1' === $options['email_notification'] ) {
 		$mail_body = '';
 
 		// run scan
 		$vulnerability_count = 0;
-
-		$vulnerabilities = get_vulnerable_plugins();
 
 		foreach ( $vulnerabilities as $plugin_name => $plugin_vulnerabilities ) {
 			foreach ( $plugin_vulnerabilities as $vuln ) {
@@ -283,6 +283,11 @@ function plugin_security_scanner_do_this_daily() {
 
 			wp_mail( $admin_email, get_bloginfo() . ' ' . __( 'Plugin Security Scan', 'plugin-security-scanner' ) . ' ' . date_i18n( get_option( 'date_format' ) ), $mail_body );
 		}
+	}
+
+	if ('1' === $options['webhook_notification']){
+		$request = new WP_Http;
+		$result = $request->post( $options['webhook_notification_url'], array('body' => json_encode($vulnerabilities), 'headers' => array( "Content-type" => "application/json" )) );
 	}
 }
 
