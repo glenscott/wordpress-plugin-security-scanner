@@ -84,6 +84,25 @@ function get_vulnerable_plugins() {
 
 	$request = new WP_Http;
 
+	global $wp_version;
+	$version_raw = $wp_version;
+	$version_trimmed = str_replace(".", "", $wp_version);
+	$result = $request->request( 'https://wpvulndb.com/api/v2/wordpresses/' . $version_trimmed );
+
+	if ( is_wp_error( $result ) ) {
+		trigger_error( $result->get_error_message(), E_USER_ERROR );
+	}
+	else {
+		if ( $result['body'] ) {
+			$version = json_decode( $result['body'] );
+			if ( isset( $version->$version_raw->vulnerabilities ) ) {
+				foreach ( $version->$version_raw->vulnerabilities as $vuln ) {
+					$vulnerabilities[$version_raw][] = $vuln;
+				}
+			}
+		}
+	}
+
 	foreach ( get_plugins() as $name => $details ) {
 		// get unique name
 		if ( preg_match( '|(.+)/|', $name, $matches ) ) {
