@@ -127,8 +127,11 @@ function get_vulnerable_plugins() {
 	$version_trimmed = str_replace(".", "", $wp_version);
 	$result = $request->request( 'https://wpvulndb.com/api/v2/wordpresses/' . $version_trimmed );
 
-	if ( is_wp_error( $result ) ) {
+	if ( is_wp_error( $result )) {
 		trigger_error( $result->get_error_message(), E_USER_ERROR );
+	}
+	else if (is_error_status_code(wp_remote_retrieve_response_code($result)) ){
+		trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_ERROR );
 	}
 	else {
 		if ( $result['body'] ) {
@@ -147,8 +150,11 @@ function get_vulnerable_plugins() {
 			$plugin_key = $matches[1];
 			$result = $request->request( 'https://wpvulndb.com/api/v2/plugins/' . $plugin_key );
 
-			if ( is_wp_error( $result ) ) {
+			if ( is_wp_error( $result )) {
 				trigger_error( $result->get_error_message(), E_USER_ERROR );
+			}
+			else if (is_error_status_code(wp_remote_retrieve_response_code($result)) ){
+				trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_ERROR );
 			}
 			else {
 				if ( $result['body'] ) {
@@ -171,8 +177,11 @@ function get_vulnerable_plugins() {
 		$theme_key = strtolower( str_replace( ' ', '', $details->name ) );
 		$result = $request->request( 'https://wpvulndb.com/api/v2/themes/' . $theme_key );
 
-		if ( is_wp_error( $result ) ) {
+		if ( is_wp_error( $result )) {
 			trigger_error( $result->get_error_message(), E_USER_ERROR );
+		}
+		else if (is_error_status_code(wp_remote_retrieve_response_code($result)) ){
+			trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_ERROR );
 		}
 		else {
 			if ( $result['body'] ) {
@@ -191,6 +200,10 @@ function get_vulnerable_plugins() {
 	}
 
 	return $vulnerabilities;
+}
+
+function is_error_status_code($statusCode){
+	return ($statusCode > 299 || $statusCode < 200) && $statusCode != 404;
 }
 
 function plugin_security_scanner_tools() {
