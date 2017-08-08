@@ -61,7 +61,13 @@ function plugin_security_scanner_register_settings() {
 			 'webhook_notification' => '0',
 			 'webhook_notification_url' => '') );
 	} else {
-		$options = get_option( 'plugin-security-scanner' ) ;
+		$options = get_option( 'plugin-security-scanner' );
+
+		if (false === array_key_exists('email_notification', $options)) {
+			$options['email_notification'] = '0';
+			update_option( 'plugin-security-scanner', $options );
+		}
+
 		if (false == array_key_exists('webhook_notification', $options)){
 			$options['webhook_notification'] = '0';
 			update_option( 'plugin-security-scanner', $options );
