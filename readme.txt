@@ -13,6 +13,10 @@ This plugin determines whether any of your plugins or themes have security vulne
 
 It will run a scan once a day, and e-mail the administrator if any vulnerable plugins or themes are found.
 
+You can also register a webhook for notifications. The webhook will trigger daily, even if no vulnerabilities found. The webhook is a post request, with JSON payload containing the vulnerabilities.
+
+You can enable the webhook under Settings\General tab - see the Plugin Security Scanner settings.
+
 It also adds a new menu option to the admin tools menu called "Plugin Security Scanner".  Clicking this runs a scan.  If the scan finds any problems, it shows you a list of plugins or themes that have vulnerabilities, along with a description of the issue.
 
 Icons made by <a href="http://www.flaticon.com/authors/alessio-atzeni" title="Alessio Atzeni">Alessio Atzeni</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0">CC BY 3.0</a>

@@ -1,0 +1,27 @@
+{
+  "{{wordpress_version}}": {
+    "release_date": "2015-08-18",
+    "changelog_url": "https://codex.wordpress.org/Version_4.3",
+    "vulnerabilities": [
+      {
+        "id": 8186,
+        "title": "WordPress <= 4.3 - Authenticated Shortcode Tags Cross-Site Scripting (XSS)",
+        "created_at": "2015-09-15T15:27:07.000Z",
+        "updated_at": "2015-09-21T12:58:32.000Z",
+        "published_date": "2015-09-15T00:00:00.000Z",
+        "references": {
+          "url": [
+            "https://wordpress.org/news/2015/09/wordpress-4-3-1/",
+            "http://blog.checkpoint.com/2015/09/15/finding-vulnerabilities-in-core-wordpress-a-bug-hunters-trilogy-part-iii-ultimatum/",
+            "http://blog.knownsec.com/2015/09/wordpress-vulnerability-analysis-cve-2015-5714-cve-2015-5715/"
+          ],
+          "cve": [
+            "2015-5714"
+          ]
+        },
+        "vuln_type": "XSS",
+        "fixed_in": "4.3.1"
+      }
+    ]
+  }
+}
