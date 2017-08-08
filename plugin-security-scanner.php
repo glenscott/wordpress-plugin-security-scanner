@@ -289,7 +289,7 @@ function plugin_security_scanner_do_this_daily() {
 
 	if ('1' === $options['webhook_notification']){
 		$request = new WP_Http;
-		$result = $request->post( $options['webhook_notification_url'], array('body' => json_encode($vulnerabilities), 'headers' => array( "Content-type" => "application/json" )) );
+		$result = $request->post( $options['webhook_notification_url'], array('body' => apply_filters('pluginsecurityscanner_webhook_message', json_encode($vulnerabilities)), 'headers' => array( "Content-type" => "application/json" )) );
 	}
 }
 
