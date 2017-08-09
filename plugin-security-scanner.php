@@ -137,7 +137,7 @@ function get_vulnerable_plugins() {
 		trigger_error( $result->get_error_message(), E_USER_ERROR );
 	}
 	else if (is_error_status_code(wp_remote_retrieve_response_code($result)) ){
-		trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_ERROR );
+		trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_NOTICE );
 	}
 	else {
 		if ( $result['body'] ) {
@@ -162,7 +162,7 @@ function get_vulnerable_plugins() {
 				trigger_error( $result->get_error_message(), E_USER_ERROR );
 			}
 			else if (is_error_status_code(wp_remote_retrieve_response_code($result)) ){
-				trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_ERROR );
+				trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_NOTICE );
 			}
 			else {
 				if ( $result['body'] ) {
@@ -189,7 +189,7 @@ function get_vulnerable_plugins() {
 			trigger_error( $result->get_error_message(), E_USER_ERROR );
 		}
 		else if (is_error_status_code(wp_remote_retrieve_response_code($result)) ){
-			trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_ERROR );
+			trigger_error( 'Failed to query wpvulndb, status code does not indicate success: ' . wp_remote_retrieve_response_code($result), E_USER_NOTICE );
 		}
 		else {
 			if ( $result['body'] ) {
